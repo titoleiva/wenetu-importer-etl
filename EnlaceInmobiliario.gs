@@ -37,7 +37,6 @@ function getEnlaceInmobiliarioQuotations() {
           var building_project = getBuildingProject(project);
           var building = getBuilding(building_project, apartment);
           var uf_price = parseFloat(price);
-          Logger.log(price + ' / ' + uf_price);
           var reference_id = quotation;
           var reference_source = 'Enlace Inmobiliario';
           
