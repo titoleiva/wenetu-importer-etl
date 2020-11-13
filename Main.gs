@@ -15,11 +15,11 @@ function onOpen() {
 
 function getImportSheet(heading) {
   
-  var sheet = SpreadsheetApp.getActive().getSheetByName('Importar');
+  var sheet = SpreadsheetApp.getActive().getSheetByName('CSV Cotizaciones');
   if (!sheet) {
-    SpreadsheetApp.getActive().insertSheet('Importar');
+    SpreadsheetApp.getActive().insertSheet('CSV Cotizaciones');
   }
-  sheet = SpreadsheetApp.getActive().getSheetByName('Importar');
+  sheet = SpreadsheetApp.getActive().getSheetByName('CSV Cotizaciones');
   sheet.getRange(1,1,1,heading[0].length).setValues(heading);
   sheet.getRange(2, 1, sheet.getLastRow(), heading[0].length).clearContent();
   
@@ -27,6 +27,19 @@ function getImportSheet(heading) {
   
 }
 
+function getImportApplicantSheet(heading) {
+  
+  var sheet = SpreadsheetApp.getActive().getSheetByName('CSV Leads');
+  if (!sheet) {
+    SpreadsheetApp.getActive().insertSheet('CSV Leads');
+  }
+  sheet = SpreadsheetApp.getActive().getSheetByName('CSV Leads');
+  sheet.getRange(1,1,1,heading[0].length).setValues(heading);
+  sheet.getRange(2, 1, sheet.getLastRow(), heading[0].length).clearContent();
+  
+  return sheet;
+  
+}
 
 function getOfficialCommune(commune) {
  
@@ -196,7 +209,7 @@ function getHeading() {
 }
 
 function formatPhone(phone) {
-  phone = phone.replace('-','').replace(' ','').replace('(','').replace(')','').replace('+',''); 
+  phone = phone.replace('-','').replace(' ','').replace('(','').replace(')','').replace('+','').replace(',',''); 
           
   if (phone.substring(0,2) == '56') {
     phone = phone.substring(2, phone.length);  
@@ -220,4 +233,3 @@ function showErrors(errors) {
     ui.alert(alert);
   }
 }
-

@@ -1,22 +1,65 @@
 function importEnlaceInmobiliario() {
   
-  var sheet = getImportSheet(getHeading());
-  var quotations = getEnlaceInmobiliarioQuotations();
+  var heading = getHeading();
+  var sheet = getImportSheet(heading);
+  var applicantsSheet = getImportApplicantSheet(heading)
+  var data = getEnlaceInmobiliarioData();
+  var quotations = getEnlaceInmobiliarioQuotations(data);
+  var applicants = getEnlaceInmobiliarioApplicants(data);
   sheet.getRange(2, 1, quotations.length, quotations[0].length).setValues(quotations); 
+  applicantsSheet.getRange(2, 1, applicants.length, applicants[0].length).setValues(applicants); 
 }
 
-function getEnlaceInmobiliarioQuotations() {
+function getEnlaceInmobiliarioQuotations(data) {
+  data = data.reduce(function(p, c) {
+       
+    var building_project = c[11]
+    var building = c[12]
+    var apartment = c[13]
+    
+    if (building_project && building && apartment) {
+      p.push(c);
+    }
+    
+    return p;
+          
+  }, []);
+  
+  return data;
+}
+
+function getEnlaceInmobiliarioApplicants(data) {
+    data = data.reduce(function(p, c) {
+       
+    var building_project = c[11]
+    var building = c[12]
+    var apartment = c[13]
+    
+    if (!(building_project && building && apartment)) {
+      p.push(c);
+    }
+    
+    return p;
+          
+  }, []);
+  
+  return data;
+  
+}
+
+
+function getEnlaceInmobiliarioData() {
   
         var errors = [];
   	    var sheet = SpreadsheetApp.getActive().getSheets()[0];
-    	var quotations = sheet.getRange(3, 2, sheet.getLastRow(), 17).getValues().reduce( 
+    	var data = sheet.getRange(3, 2, sheet.getLastRow(), 17).getValues().reduce( 
 		function(p, c) {
           
           
           //1 Cotización
           var quotation = c[0];
           //2 Fecha
-          var importation_date = getFormattedDate(c[2], c[3], c[4]);
+          var importation_date = getFormattedEnlaceDate(c[2], c[3], c[4]);
           //3 ProductoID
           var apartment = c[13].trim();
           //4 Precio
@@ -36,10 +79,16 @@ function getEnlaceInmobiliarioQuotations() {
           
           var building_project = getBuildingProject(project);
           var building = getBuilding(building_project, apartment);
-          var uf_price = parseFloat(price);
+          var uf_price = price ? parseFloat(price) : '';
           var reference_id = quotation;
           var reference_source = 'Enlace Inmobiliario';
           
+          var regex = /\d+/;
+          if (isNaN(apartment)) {
+            apartment = apartment.match(regex);  
+          }
+          
+          phone = phone.split(',')[0];
           phone = formatPhone(phone);
           var phone_type = getPhoneType(phone);
             
@@ -121,7 +170,7 @@ function getEnlaceInmobiliarioQuotations() {
                            foot_answer //1
                      ];
           
-          if (rut && rut != '(Sin infor.mac.ión-)' && name && first_last_name && email && phone && building_project && building && apartment) {
+          if (rut && rut != '(Sin infor.mac.ión-)' && name && first_last_name && email && phone) {
             p.push(quotation); 
           }  else if (rut || name || first_last_name || email || phone || building_project || building || apartment) {
             let error = 'rut: ' + rut + ' | name: ' + name + ' | first_last_name: ' + first_last_name + ' | email: ' + email 
@@ -135,11 +184,11 @@ function getEnlaceInmobiliarioQuotations() {
     
      showErrors(errors);
      
-  return quotations;
+  return data;
 }
  
 
-function getFormattedDate(year, month, day) { 
+function getFormattedEnlaceDate(year, month, day) { 
   
   if (day < 10) {
     day = '0' + day;
